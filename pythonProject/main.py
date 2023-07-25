@@ -52,7 +52,7 @@ TODAY = date.today().strftime("%Y-%m-%d")
 
 st.title('Stock Forecast App')
 
-stocks = ('GOOGL', 'AAPL', 'MSFT', 'META', 'AMZN', 'ETH', 'BTC', 'SLN')
+stocks = ('GOOGL', 'AAPL', 'MSFT', 'META', 'AMZN', 'ETH', 'XRP', 'SOL')
 selected_stock = st.selectbox('Sélectionne le dataset souhaité', stocks)
 
 company_names = {
@@ -62,8 +62,9 @@ company_names = {
     'META': 'Meta Platforms, Inc.',
     'AMZN': 'Amazon.com, Inc.',
     'ETH': 'Ethereum',
-    'BTC': 'Bitcoin',
-    'SLN': 'SLN Technologies Pvt Ltd'
+    'XRP': 'Ripple XRP',
+    'SLN': 'Solana'
+
 }
 
 st.markdown(f'<p style="font-size:25px;color:skyblue;">{company_names[selected_stock]}</p>', unsafe_allow_html=True)
@@ -93,58 +94,25 @@ plot_raw_data()
 
 # Load the appropriate model based on the selected stock
 if selected_stock == 'MSFT':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/MSFT_mdl.h5'
-    # Charger le modèle XGBoost pour MSFT
-    model_xgb = xgb.XGBRegressor()
-    model_xgb.load_model("/Users/benadem/PycharmProjects/pythonProject/venv/model_xgb_msft.json")
-elif selected_stock == 'BTC':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/BTC_mdl.h5'
-    # Charger le modèle XGBoost pour BTC
-    model_xgb = xgb.XGBRegressor()
-    model_xgb.load_model("/Users/benadem/PycharmProjects/pythonProject/venv/model_xgb_btc.json")
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/MSFT_mdl.h5'
+elif selected_stock == 'XRP':
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/XRP_mdl.h5'
 elif selected_stock == 'ETH':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/ETH_mdl.h5'
-elif selected_stock == 'SLN':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/SLN_mdl.h5'
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/ETH_mdl.h5'
+elif selected_stock == 'SOL':
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/SOL_mdl.h5'
 elif selected_stock == 'GOOGL':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/GOOGL_mdl.h5'
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/GOOGL_mdl.h5'
 elif selected_stock == 'AAPL':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/AAPL_mdl.h5'
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/AAPL_mdl.h5'
 elif selected_stock == 'META':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/META_mdl.h5'
+    model_path = '/Users/benadem/Desktop/Projet annuel/pythonProject/venv/META_mdl.h5'
 elif selected_stock == 'AMZN':
-    model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/AMZN_mdl.h5'
+    model_path = '/Users/Desktop/Projet annuel/pythonProject/venv/AMZN_mdl.h5'
 else:
     # Default to MSFT model if the selected stock is not recognized
     model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/META_mdl.h5'
 
-# Faire une prédiction avec le modèle XGBoost si le ticker est MSFT ou BTC
-if selected_stock in ['MSFT', 'BTC']:
-
-    window_size_xgb = 15  # Adjust this to match the window size used in your XGBoost model
-    X_xgb = data['Close'].values[-window_size_xgb:]  # Get the last window_size number of closing prices
-
-    # Create lag features for the last 14 days (since we'll use the current closing price in the DataFrame)
-    lags = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-    for lag in lags:
-        X_xgb = np.vstack((X_xgb, data['Close'].shift(lag).values[-window_size_xgb:]))
-
-    # Reshape the data into the correct shape for XGBoost prediction (1 row, 15 columns)
-    X_xgb = X_xgb.reshape(1, -1)
-
-    # Make a prediction with the loaded model
-    prediction_xgb = model_xgb.predict(X_xgb)
-
-    # Display the prediction
-    st.write(f"The prediction of the {selected_stock} stock price with the XGBoost model is : {prediction_xgb[0]}")
-
-    # Plot the prediction
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[tomorrow_date], y=[prediction_xgb[0]], mode='markers', name="Prediction XGBoost",
-                             marker=dict(color='green', size=10)))
-    fig.layout.update(title_text='Display', xaxis_rangeslider_visible=False, xaxis_title='Date',
-                      yaxis_title='Close Price')
-    st.plotly_chart(fig)
 model_path = '/Users/benadem/PycharmProjects/pythonProject/venv/META_mdl.h5'
 
 model = load_model(model_path)
